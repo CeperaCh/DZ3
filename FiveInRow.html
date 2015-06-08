@@ -1,0 +1,194 @@
+<html>
+
+<head>
+<title>Five In Row</title>
+
+<script LANGUAGE="JavaScript">
+
+var NUM_PLAYERS = 4;
+
+TICKS = 5;//number of crosses in row to win
+
+SIZE = 25;//side of square
+QSIZE = SIZE*SIZE;
+
+var cell = new Array(QSIZE);
+for (i = 0; i < QSIZE; i++) cell[i] = 0;
+
+IMG_SIZE = 30;
+
+x1 = new Image(IMG_SIZE,IMG_SIZE);
+x1.src = "x1.jpg";
+x2 = new Image(IMG_SIZE,IMG_SIZE);
+x2.src = "x2.jpg";
+x3 = new Image(IMG_SIZE,IMG_SIZE);
+x3.src = "x3.jpg";
+x4 = new Image(IMG_SIZE,IMG_SIZE);
+x4.src = "x4.jpg";
+e = new Image(IMG_SIZE,IMG_SIZE);
+e.src = "empty.jpg";
+
+var counter = 0;//for choosing a player
+
+function Cross(value) {
+  
+  var str = String("pole"+value);
+  var elem = document.getElementById(str);
+  
+  var playerId = counter % NUM_PLAYERS;
+  switch (playerId){
+    case 1:
+      elem.src = x1.src
+      break
+    case 2:
+      elem.src = x2.src
+      break
+    case 3:
+      elem.src = x3.src
+      break  
+    case 0:
+      elem.src = x4.src
+      break
+    default:
+      alert("Counter mistake!!!")
+  }
+
+}
+
+///////
+
+function inRow(x, y){
+		var pl_id = cell [y*SIZE + x];
+		var matches = 0;
+		
+    	for (i = x; i > -1 && cell[y*SIZE+i] == pl_id && i > x - TICKS; i--) matches++;   	
+    	
+    	for (i = x + 1; i < SIZE && cell[y*SIZE+i] == pl_id && i < x + TICKS; i++) matches++;
+
+    	return (matches >= TICKS);
+}
+function inCol(x, y){
+		var pl_id = cell [y*SIZE + x];
+		var matches = 0;
+		
+    	for (i = y; i > -1 && cell[i*SIZE+x] == pl_id && i > y - TICKS; i--) matches++;   	
+    	
+    	for (i = y + 1; i < SIZE && cell[i*SIZE+x] == pl_id && i < y + TICKS; i++) matches++;
+
+    	return (matches >= TICKS);
+}
+function inDiag(x, y){
+  		var pl_id = cell [y*SIZE + x];
+		var matches = 0;
+		
+		j = x;
+    	for (i = y; i > -1 && j > -1 && cell[i*SIZE+j] == pl_id && i > y - TICKS && j > x - TICKS; i--) {matches++; j--;}
+    	  	
+    	j = x + 1;
+    	for (i = y + 1; i < SIZE && j < SIZE && cell[i*SIZE+j] == pl_id && i < y + TICKS && j < x + TICKS; i++) {matches++; j++;}
+
+    	return (matches >= TICKS);
+}
+function inBackDiag(x, y){
+	    var pl_id = cell [y*SIZE + x];
+		var matches = 0;
+		
+    	j = x;
+    	for (i = y; i > -1 && j <SIZE && cell[i*SIZE+j] == pl_id && i > y - TICKS && j < x + TICKS ; i--) {matches++; j++;}
+    	  	
+    	j = x - 1;
+    	for (i = y + 1; i < SIZE && j > -1 && cell[i*SIZE+j] == pl_id && i < y + TICKS && j > x - TICKS; i++) {matches++; j--;}
+
+    	return (matches >= TICKS);
+}
+
+function findRow(x, y){
+    return inRow(x, y) || 
+           inCol(x, y) || 
+           inDiag(x, y)|| 
+           inBackDiag(x, y);
+}
+
+///////
+
+
+function CheckVictory(value){
+	var ord_x = value % SIZE;
+	var ord_y = parseInt(value / SIZE);
+	return findRow(ord_x, ord_y);
+}
+
+
+
+function GameOver() {
+  counter = 0;
+  for (i = 0; i < QSIZE; i++) {
+  	cell[i] = 0;
+  	
+  	var str = String("pole"+i);
+	var elem = document.getElementById(str);
+
+  	elem.src = e.src;
+  }
+  
+}
+
+function CheckDraw() {
+  if (counter == QSIZE) {
+    alert("Game is drawn.");
+    GameOver();
+  }
+}
+
+function Place(value) {
+  if (cell[value] == 0) {
+  	counter++;
+    Cross(value);
+    cell[value] = counter % NUM_PLAYERS;
+    if(cell[value] == 0) cell[value] = NUM_PLAYERS;
+    
+    if (CheckVictory(value)) {
+      alert(String("Player " + cell[value] + " won!"));
+      GameOver();
+    }
+    
+    CheckDraw();
+  }
+}
+</script>
+</head>
+
+<body BACKGROUND="Font.jpg">
+<tt>
+
+
+<!--<div align="center"><center>-->
+
+<script LANGUAGE="JavaScript">
+
+
+var res = '<table BORDER="0" CELLSPACING="0" align = "center">';
+for (var i = 0; i < SIZE; i++){
+	res += '<tr>';
+	for (var j = 0; j < SIZE; j++){
+    res += '<td align="center"><img SRC="empty.jpg" id="pole'+ String(i*SIZE + j) +
+    		'" onClick="Place(' + String(i*SIZE + j) + ')" WIDTH="' + //String(IMG_SIZE) + 
+    		'" HEIGHT="' + String(IMG_SIZE) + '"></td>';
+    		
+    }
+   res += '</tr>';
+}
+res += '</table>';
+
+document.body.innerHTML = res;
+
+</script>
+
+<!--</center></div>-->
+
+
+
+
+
+
+</html>
